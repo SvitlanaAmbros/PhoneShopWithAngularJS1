@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en" data-ng-app="shopApp">
+<head>
+	<meta charset="UTF-8" />
+	<title>Internet shop-Angular</title>
+	<link rel="stylesheet" href="css/main.css">
+	<link rel="stylesheet" href="Libraries/animate.css" />
+	<link rel="stylesheet" href="Libraries/animate.css" />
+	<link rel="stylesheet" href="Libraries/bootstrap.css">
+	<link rel="stylesheet" href="Libraries/bootstrap.min.css" />
+	<link rel="stylesheet" href="Libraries/jquery.toastmessage.css" />
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
+	<script src="Libraries/jquery-3.2.1.min.js"></script>
+	<script src="Libraries/bootstrap.js"></script>
+	<script src="Libraries/jquery.toastmessage.js"></script>
+	<script src='Libraries/wheelzoom.js'></script>
+	<script src="Libraries/wow.min.js"></script>
+	<script src="Libraries/angular.js"></script>
+
+
+	<script type="text/javascript">
+	angular
+	.module("shopApp", [])
+	.directive('moveNextOnMaxlength', function(){
+		return {
+			restrinct: "A",
+			link: function($scope, element){
+				element.on("input", function(e){
+					if(element.val().length == element.attr("maxLength")){
+						var $nextElement = element.next();
+						if($nextElement.length){
+							$nextElement[0].focus();
+						}
+					}
+				})
+			}
+		}
+	})
+	.controller("shopContrApp", function($scope, $http, $rootScope){
+            $http.get('http://apeps.kiev.ua/post/getphones').
+                then(function success(response) {
+                        $scope.listPhone=response.data;
+                        $scope.arrayFilter = ['All', 'Android', 'iOS'];
+                        $scope.select = $scope.arrayFilter[0];
+                    }, function error(response){
+                        alert("Возникла ошибка");
+                    }
+            );
+
+            $scope.totalSum = function(){
+            	let sum = 0;
+	            angular.forEach($scope.listOrder, function(value) {
+	                sum += value.priceUAH * value.countProducts;
+	            });
+
+	            return "Total sum: " + sum + "$";
+            }
+
+            $scope.showModal = function(){
+            	$("#myModal").modal('show');
+            }
+
+            $scope.addInOrder = function(item){
+					let i = findIndexInList($scope.listPhone, item.currentTarget.getAttribute("data-id").split("btn")[0]);
+					$scope.listPhone[i].countProducts-=1;
+					// alert($scope.listPhone[i].countProducts);
+
+					$rootScope.$broadcast("messageEvent", {
+                        message: $scope.listPhone[i]
+
+                    });
+
+            }
+            
+            $scope.$on("deleteEvent", (event, args) => {
+            	let id = args.message;
+                let idElem = findIndexInList($scope.listPhone, id);
+
+				$scope.listPhone[idElem].countProducts+=1;
+             });
+
+			function findIndexInList(list, id){
+				for(let i = 0; i < list.length; i++){
+					if(list[i].id == id){
+						return i;
+					}
+				}
+			}
+
+			$scope.myFilter = function(item){
+				if($scope.select == 'All'){
+					return item;
+				}else{
+					return item.operationSystem == $scope.select;
+				}
+			}
+
+	})
+
+	.controller("bucketContrApp", function($scope,  $rootScope){
+		 $scope.listOrder=[];
+
+		 $scope.$on("messageEvent", (event, args) => {  
+            if(equalsId($scope.listOrder,args.message.id)){
+            	let ind = findIndexInList($scope.listOrder, args.message.id);
+				$scope.listOrder[ind].countProducts+=1;
+            }else{
+            	let elem = {};
+            	Object.assign(elem, args.message);
+				elem.countProducts = 1;
+				$scope.listOrder.push(elem);
+            }
+        });
+
+		$scope.buyProduct = function(){
+			$rootScope.$broadcast("sendOrder", {
+                message: $scope.listOrder
+            });
+		}
+
+        $scope.totalSum = function(){
+            let sum = 0;
+	           	angular.forEach($scope.listOrder, function(value) {
+	            sum += value.priceUAH * value.countProducts;
+	        });
+
+	        return "Total sum: " + sum + "$";
+        }
+
+        function equalsId(listOrder, id){
+			let fl = false;
+			for(let i = 0; i < listOrder.length; i++){
+				if(listOrder[i].id == id){
+					fl = true;
+				}
+			}
+			return fl;
+		}
+
+		function findIndexInList(list, id){
+			for(let i = 0; i < list.length; i++){
+				if(list[i].id == id){
+					return i;
+				}
+			}
+		}
+
+		$scope.deleteFromOrder = function(item){
+            	let id = item.currentTarget.getAttribute("data-id").split("butdel")[0];
+            	let ind = findIndexInList($scope.listOrder, id);
+
+				if($scope.listOrder[ind].countProducts == 1){
+					$scope.listOrder = $scope.listOrder.filter(function(element){
+						return element.id != id;
+					})
+				}else{
+					$scope.listOrder[ind].countProducts -=1;
+				}
+				
+				$rootScope.$broadcast("deleteEvent", {
+                    message: id
+                });
+
+            }
+
+	})
+	.controller("registrContrApp", function($scope,  $rootScope){
+		$scope.typePay = ["By card", "By cash"];
+		$scope.choosingType = $scope.typePay[0];
+
+		$scope.userName;1
+		$scope.userSurname;
+		$scope.userPhone;
+		$scope.userEmail;
+		$scope.cardPattern = new RegExp("[0-9]");
+	    $scope.monthPattern = new RegExp("(0[1-9]|1[012])");
+
+		$scope.$on("sendOrder", (event, args) => {
+            $("#orderModal").modal('show');
+        });
+
+        $scope.sentOrder = function(){
+        	if($scope.choosingType == "By card"){
+            	$("#cardModal").modal('show');
+            	$scope.card1;
+            	$scope.card2;
+            	$scope.card3;
+            	$scope.card4;
+            	$scope.mth;
+            	$scope.year;
+            	$scope.cvv;
+        	}else{
+        		alert("Order was sent! We  will keep in touch with you");
+        		$("#orderModal").modal('hide');
+        	}
+        }
+
+        $scope.finishOrder = function(){
+        	alert("Order was sent! We  will keep in touch with you");
+        	$("#orderModal").modal('hide');
+        	$("#cardModal").modal('hide');
+        }
+
+        $scope.updateType = function(type){
+        	$scope.choosingType = type;
+        }
+
+	});
+	
+	</script>
+</head>
+<body>
+	<div data-ng-controller="shopContrApp">
+	<div id="img_div">
+		<img src="img/prevadzka-internetoveho-obchodu.jpg" class='bucket' ng-click="showModal()"/>
+	</div>
+
+	<div class='filter'>
+		<select data-ng-model="select" data-ng-options="item for item in arrayFilter"></select>
+	</div>
+
+	<div id="blockPhone" data-ng-repeat="item in listPhone  | filter: myFilter" >
+		<div id="{{item.id}}" class="elementShop">
+			<p id="title">{{item.productName}}</p>
+			<img ng-src='http://apeps.kiev.ua/images/phones/{{item.id}}.jpg'/>
+			<p id="brand">{{item.brandName}}</p>
+			<p class="text_style">OS: {{item.operationSystem}}</p>
+			<p class="text_style">simCards: {{item.numSimCard}}</p>
+			<p class="text_style">Rate: {{item.productRate}}</p>
+			<p class="price">{{item.priceUAH}}₴</p>
+
+			<div ng-if="item.countProducts != 0">
+		        <input type="button" data-id="{{item.id}}btn" class="btn_buy_property" value="BUY NOW" ng-click="addInOrder($event)"/>
+		    </div>
+		    <div ng-if="item.countProducts == 0">
+		        <input type="button" data-id="{{item.id}}btn" class="btn_buy_property_available" value="NOT AVAILABLE" disabled="disabled"/>
+		     </div>
+		</div>
+	</div>
+	</div>
+
+<!-- Modal -->
+<div data-ng-controller="bucketContrApp">
+<div id="myModal" class="modal fade" >
+    <div class="modal-dialog" >
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title">Confirmation</h4>
+            </div>
+            <div class="modal-body" ng-if="listOrder.length != 0">
+               <table class="table" border="1px">
+               <thead>
+			        <tr>
+			            <th>#</th>
+			            <th>Photo</th>
+			            <th>Product</th>
+			            <th>Quantity</th>
+			            <th>Price</th>
+			            <th>Action</th>
+			        </tr>
+			    </thead>
+			    <tr data-ng-repeat="item in listOrder">
+			        <td >{{$index + 1}}</td> 
+			        <td><img ng-src='http://apeps.kiev.ua/images/phones/{{item.id}}.jpg' class="img_class"  /></td>
+			        <td>{{item.productName}}</td>
+			        <td>{{item.countProducts}}</td>
+			        <td>{{(item.priceUAH * item.countProducts)}}₴</td>
+			        <td><input type="button" data-id="{{item.id}}butdel" value="DELETE" class="btn_delete" ng-click="deleteFromOrder($event)"/></td>
+			    </tr>
+				</table>
+                <p class="total_price">{{totalSum()}}</p>
+            </div>
+            <div ng-if="listOrder.length == 0">
+            	<p>No product!</p>
+            </div>
+            <div class="modal-footer">
+                <button type="buttonClose" class="btn btn-default" data-dismiss="modal">Close</button>
+                <button ng-if="listOrder.length != 0" type="buttonClose" class="btn" ng-click="buyProduct()">Buy</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal -->
+<div data-ng-controller="registrContrApp">
+	<div id="orderModal" class="modal fade" >
+	    <div class="modal-dialog" >
+	        <div class="modal-content">
+	            <div class="modal-header">
+	                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+	                <h4 class="modal-title">Confirmation</h4>
+	            </div>
+	            <div class="modal-body" ng-if="listOrder.length != 0">
+
+	            <div class='reg'>
+				
+				<form name="myForm" novalidate ng-submit="addNewUser(newUser)">
+	            	<div>
+						<p>Name</p><input type="text"  required ng-model="userName">
+						<p>Phone</p><input type="number"  required ng-model="userPhone">
+						<p>Email</p><input type="email"  required ng-model="userEmail">
+					</div>
+
+					<select ng-model="choosingType" data-ng-options="item for item in typePay" class='paying' ng-click="updateType(choosingType)"></select>
+
+					<button type="submit" class="btn btn-primary btn-block" ng-disabled="myForm.$invalid" ng-click="sentOrder()">
+	                	OK
+	                </button>
+	            </form>
+	            </div>
+	            <div ng-if="listOrder.length == 0">
+	            	<p>No product!</p>
+	            </div>
+	            <div class="modal-footer">
+	                <button type="buttonClose" class="btn btn-default" data-dismiss="modal" >Close</button>
+	            </div>
+	        	</div>
+	    	</div>
+		</div>
+	</div>
+</div>
+
+<!-- Modal -->
+<div data-ng-controller="registrContrApp">
+<div id="cardModal" class="modal fade" >
+    <div class="modal-dialog" >
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title">Confirmation</h4>
+            </div>
+
+            <form name="myForm" novalidate">
+               <div>
+					<p>Card number:</p>
+					<input class="cardInp" data-ng-pattern="cardPattern" required ng-model="card1" data-ng-minlength="4" maxlength="4" 
+					move-next-on-maxlength onkeypress="return event.charCode >= 48 && event.charCode <= 57">-
+					<input class="cardInp" data-ng-pattern="cardPattern" required ng-model="card2" data-ng-minlength="4" maxlength="4"
+					move-next-on-maxlength onkeypress="return event.charCode >= 48 && event.charCode <= 57">-
+					<input class="cardInp" data-ng-pattern="cardPattern" required ng-model="card3" data-ng-minlength="4" maxlength="4"
+					move-next-on-maxlength onkeypress="return event.charCode >= 48 && event.charCode <= 57">-
+					<input class="cardInp" data-ng-pattern="cardPattern" required ng-model="card4" data-ng-minlength="4" maxlength="4" onkeypress="return event.charCode >= 48 && event.charCode <= 57">
+					<p>Month/Year</p>
+					<input class='data' data-ng-pattern="monthPattern" required ng-model="mth" data-ng-minlength="2" data-ng-maxlength="2" onkeypress="return event.charCode >= 48 && event.charCode <= 57">
+					<input class='data' data-ng-pattern="cardPattern" required ng-model="year" data-ng-minlength="2" data-ng-maxlength="2" onkeypress="return event.charCode >= 48 && event.charCode <= 57">
+					<p>CVV:</p><input  data-ng-pattern="cardPattern" required ng-model="cvv" data-ng-minlength="3" data-ng-maxlength="3">
+					<button type="submit" class="btn btn-primary btn-block" ng-disabled="myForm.$invalid" ng-click="finishOrder()">
+                	Sent data
+                	</button>
+				</div>
+			</form>
+            <div class="modal-footer">
+                <button type="buttonClose" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
+
+ <v-flex xs12 sm3  >
+	<v-card hover class="fon">
+	    <div class="headline">
+	    </div>
+	    <v-card-media
+	        class="white--text"
+	        height="300px"
+	        :src="img" 
+	        contain>
+
+	        <v-container fill-height fluid>
+	        	<v-layout fill-height>
+			        <v-flex xs12 align-end flexbox>
+
+			        </v-flex>
+	        	</v-layout>
+	          </v-container>
+	    </v-card-media>
+	    <v-card-title class="inf" >
+	        <div class="info" >
+	          	<h2 class="text-lg-center">{{day}}</h2>
+	        </div>
+	    </v-card-title>
+	    <v-card-actions>
+	    </v-card-actions>
+	</v-card>
+</v-flex>

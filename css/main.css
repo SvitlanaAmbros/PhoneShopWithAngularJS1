@@ -1,0 +1,152 @@
+body{
+		text-align: center;
+	}
+	.elementShop{
+		border: 2px solid black;
+		width: 300px;
+		height: 700px;
+		margin:20px;
+		float: left;
+		padding:10px;
+		text-align:center;
+
+	}
+	.table{
+		text-align:center;
+	}
+	.btn_delete{
+		width: 70px;
+		height: 30px;
+		border-radius: 7px;
+		background-color :#FA8072;
+		font-size: 15px;
+		color: white;
+		text-align: center;
+	}
+	#blockPhone{
+		display: inline-block;
+		/*display: flex;*/
+     	flex-wrap: wrap;
+      	justify-content: center;
+     	align-items: center;
+     	align-content: center;
+	}
+	.btn_buy_property{
+		font-size:12pt;
+		color:white;  
+		border-radius: 7px;
+		width: 150px;
+		height: 30px;
+		background-color: green;
+	}
+
+	.btn_buy_property_available{
+		font-size:12pt;
+		color:white;  
+		border-radius: 7px;
+		width: 150px;
+		height: 30px;
+		background-color :#FA5858;
+
+	}
+	.text_style{
+		font-size:18pt;
+		margin:10px;
+  		padding:0px;
+		/*text-align:center;*/
+	}
+	.bucket{
+		width: 80px;
+		height: 80px;
+		border: 2px solid red;
+	}
+
+	#img_div{
+		/*width: 100%;*/
+		position: fixed;
+		float: left;
+		margin: 10px;
+		margin-top: 20px;
+	}
+	.img_class{
+		margin:5px;
+		height:50px;
+	}
+	.total_price{
+		float: right;
+	}
+	.title{
+		text-align: center;
+		margin-top: 30px;
+	}
+	i.fa{
+		font-size: 60px;
+		color: green;
+	}
+	.container{
+		margin-top: 25px;
+		position: fixed;
+	}
+	.wow_arr{
+		position: fixed;
+	}
+	#title{
+		font-size:22pt;
+	}
+	#brand{
+		font-size:13pt;
+	}
+	.price{
+		font-size:20pt; 
+		color:#FFBF00;
+		margin:15px;
+  		padding:0;
+	}
+	.filter{
+		float: left;
+		margin-left: 15px;
+		margin-top: 120px;
+		position: fixed;
+	}
+	.reg{
+		background: #FAEBD7;
+
+	}
+	.paying{
+		margin:10px;
+		font-size: 16px;
+		width: 180px;
+		text-align: center;
+	}
+	.input{
+		margin:0;
+	}
+	.cardInp{
+		width: 50px;
+	}
+
+	form .ng-pristine {
+            border: 1px dotted gray;
+        }
+
+        /* Данное правило распространяется на все элементы с которыми взаимодействовал прользователь и которые не прошли проверку */
+    form .ng-invalid.ng-dirty {
+        background-color: lightpink;
+    }
+
+        /* Правило для всех элементов, которые прошли проверку после взаимодействия с пользователем */
+    form .ng-valid.ng-dirty {
+       	background-color: lightgreen;
+    }
+
+        /* класс, который присваивает оформление для неправильно заполненных полей для email */
+    form .ng-invalid-email {
+        color: red;
+    }
+    #orderModal{
+    	height: 600px;
+    	padding:0;
+    }
+    .data{
+    	width: 50px;
+    }
