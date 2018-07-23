@@ -63,8 +63,6 @@
             $scope.addInOrder = function(item){
 					let i = findIndexInList($scope.listPhone, item.currentTarget.getAttribute("data-id").split("btn")[0]);
 					$scope.listPhone[i].countProducts-=1;
-					// alert($scope.listPhone[i].countProducts);
-
 					$rootScope.$broadcast("messageEvent", {
                         message: $scope.listPhone[i]
 
@@ -75,7 +73,6 @@
             $scope.$on("deleteEvent", (event, args) => {
             	let id = args.message;
                 let idElem = findIndexInList($scope.listPhone, id);
-
 				$scope.listPhone[idElem].countProducts+=1;
              });
 
@@ -101,12 +98,12 @@
 		 $scope.listOrder=[];
 
 		 $scope.$on("messageEvent", (event, args) => {  
-            if(equalsId($scope.listOrder,args.message.id)){
+			if(equalsId($scope.listOrder,args.message.id)){
             	let ind = findIndexInList($scope.listOrder, args.message.id);
 				$scope.listOrder[ind].countProducts+=1;
-            }else{
+			}else{
             	let elem = {};
-            	Object.assign(elem, args.message);
+				Object.assign(elem, args.message);
 				elem.countProducts = 1;
 				$scope.listOrder.push(elem);
             }
@@ -164,6 +161,7 @@
             }
 
 	})
+
 	.controller("registrContrApp", function($scope,  $rootScope){
 		$scope.typePay = ["By card", "By cash"];
 		$scope.choosingType = $scope.typePay[0];
@@ -282,7 +280,6 @@
     </div>
 </div>
 
-<!-- Modal -->
 <div data-ng-controller="registrContrApp">
 	<div id="orderModal" class="modal fade" >
 	    <div class="modal-dialog" >
@@ -321,7 +318,6 @@
 	</div>
 </div>
 
-<!-- Modal -->
 <div data-ng-controller="registrContrApp">
 <div id="cardModal" class="modal fade" >
     <div class="modal-dialog" >
